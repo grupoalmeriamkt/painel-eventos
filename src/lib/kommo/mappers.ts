@@ -69,6 +69,26 @@ function toNumber(raw: string | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/** Inteiro seguro p/ coluna int (ex.: convidados). Trunca; null se não numérico. */
+function toIntOrNull(raw: string | null): number | null {
+  const n = toNumber(raw);
+  return n === null ? null : Math.trunc(n);
+}
+
+/**
+ * "Horário aproximado" é texto livre no Kommo ("18h", "18:30", "às 19").
+ * Converte para "HH:MM:00" válido para coluna time, ou null se não der.
+ */
+function toTimeOrNull(raw: string | null): string | null {
+  if (!raw) return null;
+  const m = raw.match(/(\d{1,2})(?:[:h.\s](\d{2}))?/i);
+  if (!m) return null;
+  const h = Number(m[1]);
+  const min = m[2] ? Number(m[2]) : 0;
+  if (!Number.isFinite(h) || h > 23 || min > 59) return null;
+  return `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}:00`;
+}
+
 export interface ExtractedLeadFields {
   eventDate: string | null;
   eventStartTime: string | null;
@@ -93,9 +113,9 @@ export interface ExtractedLeadFields {
 export function extractLeadFields(lead: KommoLead, map: FieldMap): ExtractedLeadFields {
   return {
     eventDate: toDateOnly(getSemanticRaw(lead, map, "event_date")),
-    eventStartTime: getSemanticRaw(lead, map, "event_start_time"),
-    eventEndTime: getSemanticRaw(lead, map, "event_end_time"),
-    guestCount: toNumber(getSemanticRaw(lead, map, "guest_count")),
+    eventStartTime: toTimeOrNull(getSemanticRaw(lead, map, "event_start_time")),
+    eventEndTime: toTimeOrNull(getSemanticRaw(lead, map, "event_end_time")),
+    guestCount: toIntOrNull(getSemanticRaw(lead, map, "guest_count")),
     eventType: getSemanticRaw(lead, map, "event_type"),
     eventSpace: getSemanticRaw(lead, map, "event_space"),
     leadSource: getSemanticRaw(lead, map, "lead_source"),
