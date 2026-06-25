@@ -112,7 +112,46 @@ export default async function LeadsPage({
       </div>
 
       <Panel>
-        <div className="overflow-x-auto">
+        {/* Mobile: cards confortáveis */}
+        <div className="divide-y divide-border/60 lg:hidden">
+          {rows.length === 0 && (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              Nenhum lead com esses filtros.
+            </div>
+          )}
+          {rows.map((l) => (
+            <a
+              key={l.id}
+              href={`https://${subdomain}.kommo.com/leads/detail/${l.kommo_lead_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-4 py-3 active:bg-accent/40"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="min-w-0 flex-1 break-words text-sm font-medium leading-snug">
+                  {l.name ?? "—"}
+                </span>
+                <span className="shrink-0 font-mono text-sm font-semibold tabular-nums text-info">
+                  {formatBRL(l.current_value)}
+                </span>
+              </div>
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span>{l.stage_category ? CATEGORY_LABELS[l.stage_category] : "—"}</span>
+                {l.event_date && (
+                  <span className="font-mono tabular-nums">{formatDateBR(l.event_date)}</span>
+                )}
+                <span className={l.unit_name ? "" : "text-warning"}>
+                  {l.unit_name ?? "sem unidade"}
+                </span>
+                {l.lead_source && <span>{l.lead_source}</span>}
+                <ExternalLink className="ml-auto size-3.5 text-info" />
+              </div>
+            </a>
+          ))}
+        </div>
+
+        {/* Desktop: tabela densa */}
+        <div className="hidden overflow-x-auto lg:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground">

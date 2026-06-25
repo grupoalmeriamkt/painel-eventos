@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion, LayoutGroup } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +19,9 @@ interface IconButtonProps {
 }
 
 /**
- * Botão de ícone com label que expande no hover (desktop) ou no item ativo,
- * e tooltip no toque (mobile). Adaptado ao tema Palantir (command center).
- * Base: componente "animated-menu-bar" fornecido.
+ * Botão de ícone com label que expande no item ativo (e no hover, desktop),
+ * com indicador deslizante (framer-motion layoutId) e tooltip no toque (mobile).
+ * Tema Palantir (command center). Base: componente "animated-menu-bar" fornecido.
  */
 const IconButton: React.FC<IconButtonProps> = ({ icon: Icon, label, active, onClick }) => {
   const [hovered, setHovered] = React.useState(false);
@@ -53,13 +54,17 @@ const IconButton: React.FC<IconButtonProps> = ({ icon: Icon, label, active, onCl
       onMouseLeave={() => setHovered(false)}
       onClick={handleClick}
       className={cn(
-        "relative flex items-center justify-center overflow-visible rounded-md border transition-colors duration-300 focus:outline-none",
-        "min-h-11 min-w-11 px-0 py-2 sm:px-3",
-        active
-          ? "border-primary/40 bg-primary/10 font-medium text-primary"
-          : "border-transparent text-muted-foreground hover:bg-accent hover:text-foreground",
+        "relative flex min-h-11 min-w-11 items-center justify-center overflow-visible rounded-md px-0 py-2 transition-colors duration-200 focus:outline-none sm:px-3",
+        active ? "text-primary" : "text-muted-foreground hover:text-foreground",
       )}
     >
+      {active && (
+        <motion.span
+          layoutId="menubar-active"
+          className="absolute inset-0 rounded-md border border-primary/40 bg-primary/10"
+          transition={{ type: "spring", stiffness: 500, damping: 36 }}
+        />
+      )}
       {/* tooltip mobile */}
       <span
         className={cn(
@@ -69,14 +74,19 @@ const IconButton: React.FC<IconButtonProps> = ({ icon: Icon, label, active, onCl
       >
         {label}
       </span>
-      <span className="flex size-11 items-center justify-center">
-        <Icon className="size-5" strokeWidth={1.6} />
+      <span className="relative z-10 flex size-11 items-center justify-center">
+        <motion.span
+          animate={{ scale: active ? 1.08 : 1 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          className="flex items-center justify-center"
+        >
+          <Icon className="size-5" strokeWidth={1.6} />
+        </motion.span>
       </span>
       <span
         className={cn(
-          "pointer-events-none whitespace-nowrap text-sm transition-all duration-300",
+          "relative z-10 hidden whitespace-nowrap text-sm font-medium transition-all duration-300 sm:inline",
           isExpanded ? "ml-1 w-auto opacity-100" : "w-0 opacity-0",
-          "hidden sm:inline",
         )}
       >
         {label}
@@ -97,21 +107,23 @@ export function MenuBar({
   className?: string;
 }) {
   return (
-    <nav
-      className={cn(
-        "flex w-fit items-center gap-1 rounded-2xl border border-border bg-card/95 p-1.5 backdrop-blur transition-all duration-300",
-        className,
-      )}
-    >
-      {items.map((item) => (
-        <IconButton
-          key={item.key}
-          icon={item.icon}
-          label={item.label}
-          active={active === item.key}
-          onClick={() => onSelect?.(item.key)}
-        />
-      ))}
-    </nav>
+    <LayoutGroup>
+      <nav
+        className={cn(
+          "flex w-fit items-center gap-1 rounded-2xl border border-border bg-card/95 p-1.5 backdrop-blur",
+          className,
+        )}
+      >
+        {items.map((item) => (
+          <IconButton
+            key={item.key}
+            icon={item.icon}
+            label={item.label}
+            active={active === item.key}
+            onClick={() => onSelect?.(item.key)}
+          />
+        ))}
+      </nav>
+    </LayoutGroup>
   );
 }

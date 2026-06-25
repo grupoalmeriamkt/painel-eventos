@@ -98,7 +98,53 @@ export default async function EventosFuturosPage({
       </div>
 
       <Panel>
-        <div className="overflow-x-auto">
+        {/* Mobile: cards confortáveis */}
+        <div className="divide-y divide-border/60 lg:hidden">
+          {rows.length === 0 && (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              Nenhum evento futuro com esses filtros.
+            </div>
+          )}
+          {rows.map((e) => (
+            <a
+              key={e.id}
+              href={`https://${subdomain}.kommo.com/leads/detail/${e.kommo_lead_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-4 py-3 active:bg-accent/40"
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-sm font-semibold tabular-nums">
+                  {formatDateBR(e.event_date)}
+                </span>
+                <span
+                  className={cn(
+                    "rounded-sm px-1.5 py-0.5 font-mono text-[10px] tabular-nums",
+                    e.daysUntil <= 15 ? "bg-warning/15 text-warning" : "bg-secondary text-muted-foreground",
+                  )}
+                >
+                  {e.daysUntil}d
+                </span>
+                <span className="ml-auto font-mono text-sm font-semibold tabular-nums text-info">
+                  {formatBRL(e.current_value)}
+                </span>
+              </div>
+              <div className="mt-1 break-words text-sm font-medium leading-snug">{e.name ?? "—"}</div>
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span className={e.unit_name ? "" : "text-warning"}>
+                  {e.unit_name ?? "sem unidade"}
+                </span>
+                {e.event_type && <span>{e.event_type}</span>}
+                {e.guest_count != null && <span>{e.guest_count} conv.</span>}
+                {e.event_space && <span className="truncate">{e.event_space}</span>}
+                <ExternalLink className="ml-auto size-3.5 text-info" />
+              </div>
+            </a>
+          ))}
+        </div>
+
+        {/* Desktop: tabela densa */}
+        <div className="hidden overflow-x-auto lg:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground">

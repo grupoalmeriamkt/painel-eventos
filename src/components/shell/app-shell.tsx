@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -8,8 +9,8 @@ import {
   Menu,
   X,
   LayoutDashboard,
+  CalendarHeart,
   Users,
-  CalendarClock,
   AlertTriangle,
   MoreHorizontal,
 } from "lucide-react";
@@ -20,8 +21,8 @@ import { MenuBar, type MenuBarItem } from "@/components/ui/animated-menu-bar";
 // Itens da barra inferior (mobile / iOS tab bar)
 const MOBILE_TABS: (MenuBarItem & { href?: string })[] = [
   { key: "/", label: "Geral", icon: LayoutDashboard, href: "/" },
+  { key: "/agenda", label: "Agenda", icon: CalendarHeart, href: "/agenda" },
   { key: "/leads", label: "Leads", icon: Users, href: "/leads" },
-  { key: "/eventos-futuros", label: "Eventos", icon: CalendarClock, href: "/eventos-futuros" },
   { key: "/alertas", label: "Alertas", icon: AlertTriangle, href: "/alertas" },
   { key: "__more", label: "Mais", icon: MoreHorizontal },
 ];
@@ -174,7 +175,14 @@ export function AppShell({
           {actions && <div className="ml-auto flex items-center gap-2">{actions}</div>}
         </header>
         <main className="flex-1 overflow-x-hidden p-3 pb-24 sm:p-5 lg:pb-5">
-          {children}
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {children}
+          </motion.div>
         </main>
       </div>
 

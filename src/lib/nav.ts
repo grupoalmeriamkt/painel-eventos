@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   CalendarDays,
   CalendarRange,
+  CalendarHeart,
   Filter,
   CalendarClock,
   DollarSign,
@@ -26,6 +27,7 @@ export const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
     title: "Geral",
     items: [
       { href: "/", label: "Visão Geral", icon: LayoutDashboard, ready: true },
+      { href: "/agenda", label: "Agenda", icon: CalendarHeart, ready: true },
       { href: "/diario", label: "Acompanhamento Diário", icon: CalendarDays, ready: false },
       { href: "/mensal", label: "Resumo Mensal", icon: CalendarRange, ready: false },
     ],
